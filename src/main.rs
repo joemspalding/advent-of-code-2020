@@ -1,8 +1,6 @@
-mod lib;
+use advent_of_code::{day_one};
 
 fn main() {
-    println!("{:?}", lib::day_one::find_2020_product_two_num().unwrap());
-    println!("{:?}", lib::day_one::find_2020_product_three_num().unwrap());
-
-
+    println!("two numbers: {}", day_one::find_2020_product_two_num().unwrap());
+    println!("three numbers: {}", day_one::find_2020_product_three_num().unwrap());
 }
