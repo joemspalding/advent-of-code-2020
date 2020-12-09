@@ -214,6 +214,7 @@ pub mod day_four {
         issue_year: Option<String>, // iyr
         expiration_year: Option<String>, // eyr
         height: Option<String>, // hgt
+        hair_color: Option<String>, // hcl
         eye_color: Option<String>, // ecl
         passport_id: Option<String>, // pid
         country_id: Option<String>, // cid
@@ -244,6 +245,10 @@ pub mod day_four {
                         acc.height = Some(current[4..current.len()].to_string());
                         acc
                     },
+                    "hcl" => {
+                        acc.hair_color = Some(current[4..current.len()].to_string());
+                        acc
+                    },
                     "ecl" => {
                         acc.eye_color = Some(current[4..current.len()].to_string());
                         acc
@@ -266,34 +271,21 @@ pub mod day_four {
                 issue_year: None, // iyr
                 expiration_year: None, // eyr
                 height: None, // hgt
+                hair_color: None, // hcl
                 eye_color: None, // ecl
                 passport_id: None, // pid
                 country_id: None, // cid
             }
         }
-        fn is_valid(self) -> bool {
-            // println!("---");
-            // println!("{:?}", self);
-            // println!("{}", self.temp());
-            // println!("============");true
-            // not checking for cid
-
-            
+        fn is_valid(self) -> bool {   
             self.birth_year != None
             && self.issue_year != None
             && self.expiration_year != None
             && self.height != None
+            && self.hair_color != None
             && self.eye_color != None
             && self.passport_id != None
         }
-        // fn temp(self) -> bool {
-        //     self.birth_year != None
-        //     && self.issue_year != None
-        //     && self.expiration_year != None
-        //     && self.height != None
-        //     && self.eye_color != None
-        //     && self.passport_id != None
-        // }
     }
 
     pub fn count_valid_passports() -> usize{
