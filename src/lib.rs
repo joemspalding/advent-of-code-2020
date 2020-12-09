@@ -206,4 +206,101 @@ pub mod day_three {
     }
 }
 
+pub mod day_four {
+    const PASSPORT_DATA: &str = super::constants::DAY_FOUR;
+    #[derive(Debug)]
+    struct PassportData {
+        birth_year: Option<String>, // byr
+        issue_year: Option<String>, // iyr
+        expiration_year: Option<String>, // eyr
+        height: Option<String>, // hgt
+        eye_color: Option<String>, // ecl
+        passport_id: Option<String>, // pid
+        country_id: Option<String>, // cid
+    }
 
+    impl PassportData {
+        fn new(input: &str) -> Self {
+            // string data is disorganized and may omit fields
+            // println!("{}", input);
+            // println!("---");
+            input.split(|c| c == ' ' || c == '\u{000A}')
+            // .map(|x| {println!("{}", x); x})
+            .fold(PassportData::new_empty(), |mut acc: PassportData, current: &str| {
+                match &current[0..3] {
+                    "byr" => {
+                        acc.birth_year = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    "iyr" => {
+                        acc.issue_year = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    "eyr" => {
+                        acc.expiration_year = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    "hgt" => {
+                        acc.height = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    "ecl" => {
+                        acc.eye_color = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    "pid" => {
+                        acc.passport_id = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    "cid" => {
+                        acc.country_id = Some(current[4..current.len()].to_string());
+                        acc
+                    },
+                    _ => acc,
+                }
+            })
+        }
+        fn new_empty() -> Self {
+            Self {
+                birth_year: None, // byr
+                issue_year: None, // iyr
+                expiration_year: None, // eyr
+                height: None, // hgt
+                eye_color: None, // ecl
+                passport_id: None, // pid
+                country_id: None, // cid
+            }
+        }
+        fn is_valid(self) -> bool {
+            // println!("---");
+            // println!("{:?}", self);
+            // println!("{}", self.temp());
+            // println!("============");true
+            // not checking for cid
+
+            
+            self.birth_year != None
+            && self.issue_year != None
+            && self.expiration_year != None
+            && self.height != None
+            && self.eye_color != None
+            && self.passport_id != None
+        }
+        // fn temp(self) -> bool {
+        //     self.birth_year != None
+        //     && self.issue_year != None
+        //     && self.expiration_year != None
+        //     && self.height != None
+        //     && self.eye_color != None
+        //     && self.passport_id != None
+        // }
+    }
+
+    pub fn count_valid_passports() -> usize{
+        println!("{}", PASSPORT_DATA.split("\n\n").into_iter().count());
+
+        PASSPORT_DATA.split("\n\n").into_iter()
+        .filter(|x| PassportData::new(x).is_valid())
+        .count()
+    }
+}
