@@ -208,7 +208,7 @@ pub mod day_three {
 
 pub mod day_four {
     const PASSPORT_DATA: &str = super::constants::DAY_FOUR;
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     struct PassportData {
         birth_year: Option<String>, // byr
         issue_year: Option<String>, // iyr
@@ -223,10 +223,7 @@ pub mod day_four {
     impl PassportData {
         fn new(input: &str) -> Self {
             // string data is disorganized and may omit fields
-            // println!("{}", input);
-            // println!("---");
             input.split(|c| c == ' ' || c == '\u{000A}')
-            // .map(|x| {println!("{}", x); x})
             .fold(PassportData::new_empty(), |mut acc: PassportData, current: &str| {
                 match &current[0..3] {
                     "byr" => {
@@ -277,7 +274,9 @@ pub mod day_four {
                 country_id: None, // cid
             }
         }
-        fn is_valid(self) -> bool {   
+
+
+        fn has_required_fields(&self) -> bool {  
             self.birth_year != None
             && self.issue_year != None
             && self.expiration_year != None
@@ -286,13 +285,110 @@ pub mod day_four {
             && self.eye_color != None
             && self.passport_id != None
         }
+
+        fn has_fields_with_valid_data(self) -> Result<bool, Box<dyn std::error::Error>> {
+            
+            if !self.has_required_fields() {
+                Ok(false)
+            } else {
+                let birth_year: usize = match self.birth_year {
+                    Some(n) => Ok(n.parse::<usize>()?),
+                    None => Err(NoneError)
+                }?;
+                let issue_year: usize = match self.issue_year {
+                    Some(n) => Ok(n.parse::<usize>()?),
+                    None => Err(NoneError)
+                }?;
+                let expiration_year: usize = match self.expiration_year {
+                    Some(n) => Ok(n.parse::<usize>()?),
+                    None => Err(NoneError)
+                }?;
+
+                // println!("{:?}", 1920 <= birth_year && birth_year <= 2002);
+                // println!("{:?}", 2010 <= issue_year && issue_year <= 2020);
+                // println!("{:?}", 2020 <= expiration_year && expiration_year <= 2030);
+                // println!("....");
+                let aaaaa = Ok(
+                    1920 <= birth_year && birth_year <= 2002 // solving for birth year
+                    && 2010 <= issue_year && issue_year <= 2020 // solving for issue year
+                    && 2020 <= expiration_year && expiration_year <= 2030 // solving for expiration year
+                    && { // Solving for height
+                        match self.height {
+                            Some(n) => {
+                                // println!("{}", n);
+                                let measurement = &n[n.len()-2..n.len()]; // expecting "cm" or "in"
+                                match measurement {
+                                    "cm" => {
+                                        let cm: usize = n[..3].parse()?;
+                                        Ok(150 <= cm && cm <= 193)
+                                    },
+                                    "in" => {
+                                        let inch: usize = n[..2].parse()?;
+                                        Ok(59 <= inch && inch <= 76)
+                                    },
+                                    _ => Ok(false)
+                                }
+                            },
+                            None => Err(NoneError)
+                        }
+                    }? && { // solving for hair color (#0-9, a-f)
+                        match self.hair_color {
+                            Some(n) => {
+                                let regex = regex::Regex::new(r"^#(\d|[a-f]){6}$").unwrap();
+                                let ismatch = regex.is_match(&n.to_string());
+                                // println!("hair: {}", ismatch);
+                                Ok(ismatch)
+                            },
+                            None => Err(NoneError)
+                        }
+                    }? && { // solving for eye color
+                        match self.eye_color {
+                            Some(n) => {
+                                // println!("eye-color: {}", n);
+                                Ok(n == "amb"
+                                || n == "blu"
+                                || n == "brn"
+                                || n == "gry"
+                                || n == "grn"
+                                || n == "hzl"
+                                || n == "oth")
+                            },
+                            None => Err(NoneError)
+                        }
+                    }? && { // solve for passport id
+                        match self.passport_id {
+                            Some(n) => {
+                                let regex = regex::Regex::new(r"\d{9}").unwrap();
+                                Ok(regex.is_match(&n.to_string()))
+                            }
+                            None => Err(NoneError)
+                        }
+                    }?
+                );
+                aaaaa
+            }
+        }
+    }
+    #[derive(Debug)]
+    struct NoneError;
+    
+    impl std::error::Error for NoneError {}
+    impl std::fmt::Display for NoneError {
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(f, "No value found")
+        }
+    }
+    
+    pub fn count_valid_passports() -> usize{
+        PASSPORT_DATA.split("\n\n").into_iter()
+        .filter(|x| PassportData::new(x).has_required_fields())
+        .count()
     }
 
-    pub fn count_valid_passports() -> usize{
-        println!("{}", PASSPORT_DATA.split("\n\n").into_iter().count());
-
+    pub fn count_valid_passports_with_valid_data() -> usize {
         PASSPORT_DATA.split("\n\n").into_iter()
-        .filter(|x| PassportData::new(x).is_valid())
+        .filter(|x| PassportData::new(x).has_fields_with_valid_data().unwrap_or(false))
         .count()
+
     }
 }

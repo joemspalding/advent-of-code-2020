@@ -8,4 +8,5 @@ fn main() {
     // println!("trees in all patterns: {}", day_three::find_trees_all_patterns());'
     
     println!("valid passports: {}", day_four::count_valid_passports());
+    println!("valid passports with valid data: {}", day_four::count_valid_passports_with_valid_data());
 }
