@@ -1,8 +1,10 @@
+mod constants;
+
 pub mod day_one {
-    const EXPENSE_REPORT: [usize; 200] = [1891,1975,1987,1923,1928,1993,1946,1947,2005,1897,1971,1929,1875,1945,1680,811,1901,1396,1942,1282,1941,1978,1884,1879,1230,2010,1881,1979,1996,1904,1934,1865,2003,2006,1966,1860,1259,1959,1931,1963,1878,1880,151,1925,1663,1908,1863,1391,1922,1968,1998,1084,1982,1960,1938,1876,1937,1882,1873,1926,1986,1416,1864,1862,1969,1913,532,1866,1242,1933,1903,965,1927,1890,1991,1388,1992,1902,1907,1964,1394,2009,1920,630,1932,1854,1951,1852,1983,1314,1855,1954,1921,1989,1871,1995,1885,1974,1915,1872,1251,1899,1985,1889,1935,1912,946,1965,1739,1973,1911,1910,1917,1918,1900,1886,1477,2000,1916,1077,2004,1456,1867,1970,1999,1919,1726,706,1930,1994,1988,1997,1870,1953,652,1893,1898,1883,1957,1972,1874,1977,1955,2001,1906,1389,1848,1940,1877,1962,1948,1887,1924,1403,1408,1861,1892,1990,1222,677,1392,1113,1085,1894,1106,1939,1961,1944,1952,1643,1404,1895,1958,1976,1206,1905,1076,1888,1896,1943,1950,2008,1967,164,1981,1868,1914,1909,1956,341,1379,2007,1563,1980,1072,1949,1250,1258,1092,2002];
+    const EXPENSE_REPORT: [usize; 200] = super::constants::DAY_ONE;
 
     pub fn find_2020_product_two_num() -> Option<usize> {
-       for i in 0..EXPENSE_REPORT.len() {
+        for i in 0..EXPENSE_REPORT.len() {
             for j in i..EXPENSE_REPORT.len() {
                 if EXPENSE_REPORT[i] + EXPENSE_REPORT[j] == 2020 {
                      return Some(EXPENSE_REPORT[i] * EXPENSE_REPORT[j]);
@@ -29,4 +31,177 @@ pub mod day_one {
 
 }
 
+pub mod day_two {
+    const CORRUPTED_PASSWORDS: [(usize, usize, char, &str); 1000] = super::constants::DAY_TWO;
 
+    struct PasswordFormat {
+        min_count: usize,
+        max_count: usize,
+        letter: char,
+        password: String
+    }
+
+    impl PasswordFormat {
+        pub fn new(
+            min_count: usize,
+            max_count: usize,
+            letter: char,
+            password: String
+        ) -> Self {
+            Self {
+                min_count,
+                max_count,
+                letter,
+                password,
+            }
+        }
+
+        pub fn is_valid(&self) -> bool {
+            let count = self.password.chars().filter(|c| *c == self.letter).count();
+            count >= self.min_count && count <= self.max_count
+        }
+
+        pub fn is_valider(&self) -> bool {
+            let positions: (Option<bool>, Option<bool>) = self.password.chars()
+            .enumerate()
+            .fold((None, None), |mut acc, (i, x)| {
+                let index = i+1;
+                if index == self.min_count {
+                    acc.0 = Some(x == self.letter);
+                } else if index == self.max_count {
+                    acc.1 = Some(x == self.letter);
+                }
+                acc
+            });
+
+            let is_first_letter_match = positions.0.unwrap();
+            let is_second_letter_match = positions.1.unwrap();
+
+            is_first_letter_match && !is_second_letter_match
+            || !is_first_letter_match && is_second_letter_match
+        }
+    }
+
+
+    pub fn find_valid_passwords() -> usize {
+        CORRUPTED_PASSWORDS.iter()
+            .map(|x| PasswordFormat::new(x.0, x.1, x.2, x.3.to_string()))
+            .filter(|pw| pw.is_valid())
+            .count()
+    }
+
+    pub fn find_valider_passwords() -> usize {
+        CORRUPTED_PASSWORDS.iter()
+            .map(|x| PasswordFormat::new(x.0, x.1, x.2, x.3.to_string()))
+            .filter(|pw| pw.is_valider())
+            .count()
+    }
+}
+
+pub mod day_three {
+    pub const SLOPE_PATTERN: &str = super::constants::DAY_THREE;
+    #[derive(Debug, Clone)]
+    struct SlopePattern {
+        slope_pattern: Vec<String>, // line length is 31
+        line_length: usize
+    }
+
+    impl SlopePattern {
+        pub fn new() -> Self {
+            let slope_pattern: Vec<String> = SLOPE_PATTERN.lines()
+                .map(|s| s.to_string())
+                .collect();
+
+            let line_length = slope_pattern[0].chars().count();
+            Self {
+                slope_pattern,
+                line_length 
+            }
+        }
+
+        pub fn get_slope_patterns(self) -> Vec<String> {
+            self.slope_pattern
+        }
+        pub fn get_line_legth(self) -> usize {
+            self.line_length
+        }
+    }
+
+
+    pub fn find_trees() -> usize {
+        let slope_pattern = SlopePattern::new();
+        let slope_patterns = slope_pattern.clone().get_slope_patterns();
+        let line_length = slope_pattern.clone().get_line_legth();
+
+
+        let mut trees = 0;
+        let mut horizontal_position: usize = 0;
+
+        for i in 0..slope_patterns.iter().count() {
+            trees = {
+                if slope_patterns[i].as_bytes()[horizontal_position] as char == '#' {
+                    trees + 1
+                } else {
+                    trees
+                }
+            };
+
+            // update the position in the char array
+            horizontal_position += 3;
+            if horizontal_position >= line_length {
+                horizontal_position = horizontal_position - line_length;
+            }
+
+        }
+
+        trees
+    }
+    #[derive(Debug, Clone, Copy)]
+    struct TreeCountingObj {
+        horizontal_increment: usize,
+        vertical_increment: usize,
+        horizontal_position: usize,
+        trees: usize
+    }
+
+    pub fn find_trees_all_patterns() -> usize {
+        let slope_pattern = SlopePattern::new();
+        let slope_patterns = slope_pattern.clone().get_slope_patterns();
+        let line_length = slope_pattern.clone().get_line_legth();
+
+        let mut tree_counting_obj_array = vec![
+            TreeCountingObj {horizontal_increment: 1, vertical_increment: 1, horizontal_position: 0, trees: 0},
+            TreeCountingObj {horizontal_increment: 3, vertical_increment: 1, horizontal_position: 0, trees: 0},
+            TreeCountingObj {horizontal_increment: 5, vertical_increment: 1, horizontal_position: 0, trees: 0},
+            TreeCountingObj {horizontal_increment: 7, vertical_increment: 1, horizontal_position: 0, trees: 0},
+            TreeCountingObj {horizontal_increment: 1, vertical_increment: 2, horizontal_position: 0, trees: 0},
+        ];
+
+        for i in 0..slope_patterns.iter().count() {
+            tree_counting_obj_array = tree_counting_obj_array.iter()
+            .map(|x| *x)
+            .map(|mut x| {
+                // go through array and figure out if vertical increment matches current line number using "%"
+                if i == 0 || i % x.vertical_increment == 0 {
+
+                    // if it does, then check the horizontal increment for "#", if it matches, increment the trees and update the horizontal position at that element
+                    x.trees = {
+                        if slope_patterns[i].as_bytes()[x.horizontal_position] as char == '#' {
+                            x.trees + 1
+                        } else {
+                            x.trees
+                        }
+                    };
+
+                    x.horizontal_position += x.horizontal_increment;
+                    if x.horizontal_position >= line_length {
+                        x.horizontal_position = x.horizontal_position - line_length;
+                    }
+                }
+                x
+            }).collect();
+        }
+        tree_counting_obj_array.iter().fold(1 as usize, |acc, current| {acc * current.trees})
+
+    }
+}
