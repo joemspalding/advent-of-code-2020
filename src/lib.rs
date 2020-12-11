@@ -275,7 +275,6 @@ pub mod day_four {
             }
         }
 
-
         fn has_required_fields(&self) -> bool {  
             self.birth_year != None
             && self.issue_year != None
@@ -304,18 +303,13 @@ pub mod day_four {
                     None => Err(NoneError)
                 }?;
 
-                // println!("{:?}", 1920 <= birth_year && birth_year <= 2002);
-                // println!("{:?}", 2010 <= issue_year && issue_year <= 2020);
-                // println!("{:?}", 2020 <= expiration_year && expiration_year <= 2030);
-                // println!("....");
-                let aaaaa = Ok(
+                let is_valid = Ok(
                     1920 <= birth_year && birth_year <= 2002 // solving for birth year
                     && 2010 <= issue_year && issue_year <= 2020 // solving for issue year
                     && 2020 <= expiration_year && expiration_year <= 2030 // solving for expiration year
                     && { // Solving for height
                         match self.height {
                             Some(n) => {
-                                // println!("{}", n);
                                 let measurement = &n[n.len()-2..n.len()]; // expecting "cm" or "in"
                                 match measurement {
                                     "cm" => {
@@ -336,7 +330,6 @@ pub mod day_four {
                             Some(n) => {
                                 let regex = regex::Regex::new(r"^#(\d|[a-f]){6}$").unwrap();
                                 let ismatch = regex.is_match(&n.to_string());
-                                // println!("hair: {}", ismatch);
                                 Ok(ismatch)
                             },
                             None => Err(NoneError)
@@ -344,7 +337,6 @@ pub mod day_four {
                     }? && { // solving for eye color
                         match self.eye_color {
                             Some(n) => {
-                                // println!("eye-color: {}", n);
                                 Ok(n == "amb"
                                 || n == "blu"
                                 || n == "brn"
@@ -365,7 +357,7 @@ pub mod day_four {
                         }
                     }?
                 );
-                aaaaa
+                is_valid
             }
         }
     }
@@ -390,5 +382,50 @@ pub mod day_four {
         .filter(|x| PassportData::new(x).has_fields_with_valid_data().unwrap_or(false))
         .count()
 
+    }
+}
+
+pub mod day_five {
+    const TICKETS: &str = super::constants::DAY_FIVE;
+    fn get_seat_scores() -> Vec<usize> {
+        TICKETS.lines().map(|x| {
+            let row_binary_str = x[0..7].chars().fold(Vec::new(), |mut acc, current| {
+                match current {
+                    'F' => acc.push('0'),
+                    'B' => acc.push('1'),
+                    _ => {}
+                }
+                acc
+            }).iter().collect::<String>();
+            let row = usize::from_str_radix(&row_binary_str, 2).unwrap();
+            let column_binary_str = x[7..10].chars().fold(Vec::new(), |mut acc, current| {
+                match current {
+                    'L' => acc.push('0'),
+                    'R' => acc.push('1'),
+                    _ => {}
+                }
+                acc
+            }).iter().collect::<String>();
+            let column = usize::from_str_radix(&column_binary_str, 2).unwrap();
+            
+            row * 8 + column
+        }).collect()
+    }
+    pub fn get_max_seat_score() -> usize {
+        *get_seat_scores().iter().max().unwrap()
+    }
+
+    pub fn get_my_seat_score() -> usize {
+        let mut scores: Vec<usize> = get_seat_scores();
+        scores.sort();
+
+        let min = scores.iter().min().unwrap();
+        scores.iter().fold(*min, |acc, current| {
+            if acc + 1 == *current {
+                *current
+            } else { 
+                acc
+            }
+        }) + 1
     }
 }
