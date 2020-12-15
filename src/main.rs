@@ -15,4 +15,7 @@ fn main() {
     // println!("{:?}", day_seven::find_bags_that_have_shiny_gold_bag());
     // println!("{:?}", day_eight::find_accumulator_value_at_infinite_loop());
     // println!("{:?}", day_eight::find_acc_after_fix());
+    let vulnerability = day_nine::find_vulnerability();
+    println!("{:?}", day_nine::find_vulnerability());
+    println!("{:?}", day_nine::find_encryption_weakness(vulnerability));
 }

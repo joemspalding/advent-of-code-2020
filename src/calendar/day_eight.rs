@@ -54,9 +54,6 @@ impl GameBoy {
         loop {
             // if has not been checked
             if !self.instructions[i].1 {
-                // println!("========================", );
-                // println!("{:?}", i);
-                // println!("{:?}", self.instructions[i]);
                 self.instructions[i].1 = true;
                 match self.instructions[i].0 {
                     Instruction::acc(val) => {
@@ -95,10 +92,7 @@ impl GameBoy {
                     },
                 }
             } else {
-                // if it has been checked, then we exit the loop and return the current accumulator
-                // println!("==========LAST==========", );
-                // println!("{:?}", i);
-                // println!("{:?}", self.instructions[i]);
+                // if it has been checked, then we exit the loop and return the compiled instructions
                 break;
             }
         };
