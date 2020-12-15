@@ -114,7 +114,6 @@ impl GameBoy {
 
     fn update_instructions(&mut self) -> i32 {
         let compiled_instructions = self.compile(None);
-        let POINT_OF_TRUTH_INSTRUCTIONS = self.instructions.clone();
         // 1 - go backwards so we only affect recent changes
         for i in (0..compiled_instructions.len()).rev() {
             let compiled_instruction = compiled_instructions.get(i).unwrap();
