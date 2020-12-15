@@ -12,6 +12,7 @@ fn main() {
     // println!("{:?}", day_five::get_my_seat_score());
     // println!("{:?}", day_six::get_answers_count_sum());
     // println!("{:?}", day_six::get_all_answers());
-    println!("{:?}", day_seven::find_bags_that_have_shiny_gold_bag());
-
+    // println!("{:?}", day_seven::find_bags_that_have_shiny_gold_bag());
+    // println!("{:?}", day_eight::find_accumulator_value_at_infinite_loop());
+    // println!("{:?}", day_eight::find_acc_after_fix());
 }
